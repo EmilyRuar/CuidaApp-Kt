@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Cuidaplus</string>
+    <string name="Emily_Rupay"> </string>
+
+    <string name="Btn_ir_registros">Registrarme</string>
+    <string name="Btn_ir_logeo">Iniciar Sesión</string>
+
+    <string name="R_Et_nombre_usuario">Nombre de usuario</string>
+    <string name="R_Et_email">Correo</string>
+    <string name="R_Et_password">Contraseña</string>
+    <string name="R_Et_r_password">Repita su contraseña</string>
+    <string name="Btn_registrar">Registrar</string>
+
+    <string name="L_Et_email">Correo</string>
+    <string name="L_El_password">Contraseña</string>
+    <string name="Btn_login">Ingresar</string>
+
+
+</resources>

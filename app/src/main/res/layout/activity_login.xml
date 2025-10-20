@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".LoginActivity">
+
+    <!-- Contenedor principal -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_centerInParent="true"
+        android:padding="24dp">
+
+        <!-- Logo de la app -->
+        <ImageView
+            android:id="@+id/logo_cuidapp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@mipmap/ic_cuida"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/app_name" />
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tv_login_titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Iniciar sesión"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1E3A8A"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Campo Email -->
+        <EditText
+            android:id="@+id/L_Et_email"
+            android:hint="Correo electrónico"
+            android:inputType="textEmailAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Campo Contraseña -->
+        <EditText
+            android:id="@+id/L_Et_password"
+            android:hint="Contraseña"
+            android:inputType="textPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Botón Iniciar sesión -->
+        <Button
+            android:id="@+id/Btn_Login"
+            android:text="Ingresar"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#1E3A8A"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Enlace a registro -->
+        <TextView
+            android:id="@+id/tv_ir_registro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿No tienes cuenta? Regístrate aquí"
+            android:textSize="14sp"
+            android:textColor="#1E3A8A"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+</RelativeLayout>

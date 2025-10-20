@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7FBFF"
+    tools:context=".Inicio">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="40dp">
+
+        <!-- Logo de la app -->
+        <ImageView
+            android:id="@+id/logo_cuidapp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@mipmap/ic_cuida"
+            android:layout_marginBottom="100dp"
+            android:contentDescription="@string/app_name" />
+
+        <!-- Título -->
+
+        <TextView
+            android:id="@+id/txt_bienvenida"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="100dp"
+            android:text="Bienvenido a CuidApp"
+            android:textColor="#1E3A8A"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/Btn_ir_logeo"
+            android:text="@string/Btn_ir_logeo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:background="#1E3A8A"
+            android:textSize="18sp"
+            android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/Btn_ir_registros"
+            android:text="@string/Btn_ir_registros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:background="#1E3A8A"
+            android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/Btn_ir_invitado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingresar como invitado"
+            android:textAllCaps="false"
+            android:textColor="#3B82F6"
+            android:textSize="16sp"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="10dp" />
+
+    </LinearLayout>
+
+</RelativeLayout>
