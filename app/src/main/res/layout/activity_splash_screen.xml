@@ -6,6 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1E3A8A"
     tools:context=".SplashScreen">
 
   <LinearLayout
@@ -15,8 +16,8 @@
       android:gravity="center">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:layout_width="319dp"
-        android:layout_height="334dp"
+        android:layout_width="372dp"
+        android:layout_height="373dp"
         app:lottie_autoPlay="true"
         app:lottie_fileName="doctor_animacion.json"
         app:lottie_imageAssetsFolder="assets"
@@ -26,12 +27,14 @@
       android:textStyle ="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
     <TextView
-        android:text="@string/app_name"
+        android:layout_width="259dp"
+        android:layout_height="50dp"
+        android:text="Bienvenido a CuidApp"
+        android:textColor="@color/white"
         android:textSize="25sp"
-        android:textStyle ="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:textStyle="bold" />
   </LinearLayout>
 
 

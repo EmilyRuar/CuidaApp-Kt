@@ -37,18 +37,27 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 // ------------------------
-// Modelo de datos modificado
+// MODELOS DE DATOS
 // ------------------------
-data class Cuidador(val nombre: String, val especialidad: String, val valoracion: Float, val fotoRes: Int)
+
+// Representa un cuidador/profesional
+data class Cuidador(
+    val nombre: String,
+    val especialidad: String,
+    val valoracion: Float,
+    val fotoRes: Int // recurso drawable (ej: R.drawable.cuidador1)
+)
+
+// Mensaje del chat (texto y si fue enviado por el usuario)
 data class Message(val text: String, val isSentByUser: Boolean)
-// Añadido 'id' para facilitar las operaciones CRUD (Actualizar y Eliminar)
+
+// Reserva con referencia a cuidador, fecha, hora e id para identificarla
 data class Reserva(val cuidador: Cuidador, val fecha: String, val hora: String, val id: Int)
 
 // ------------------------
-// Lista de cuidadores con foto (Asume que tienes los drawables R.drawable.cuidadorX)
+// LISTA DE CUIDADORES (MOCK / DATOS LOCALES)
 // ------------------------
-// NOTA: Para que este código funcione, debes asegurarte de tener las imágenes
-// nombradas cuidador1, cuidador9, cuidador3, etc., en tu carpeta res/drawable.
+// Recuerda: debes tener los drawables con los nombres referenciados en res/drawable
 val cuidadoresList = listOf(
     Cuidador("Ana Pérez", "Cuidadora de Adultos Mayores", 4.8f, R.drawable.cuidador1),
     Cuidador("Luis Gómez", "Enfermero Calificado", 4.5f, R.drawable.cuidador9),
@@ -66,25 +75,26 @@ val cuidadoresList = listOf(
 )
 
 // ------------------------
-// BottomNavigation Items
+// ITEMS PARA BOTTOM NAVIGATION
 // ------------------------
+// Clase sealed para organizar las pestañas del bottom bar
 sealed class BottomNavItem(val label: String, val icon: ImageVector) {
-
     object Equipo : BottomNavItem("Equipo", Icons.Filled.Person)
     object Agenda : BottomNavItem("Agenda", Icons.Filled.CalendarToday)
-
     object Home : BottomNavItem("Home", Icons.Filled.Home)
     object Chat : BottomNavItem("Chat", Icons.Filled.Chat)
     object Reserva : BottomNavItem("Reserva", Icons.Filled.List)
 }
 
 // ------------------------
-// HomePrincipalActivity
+// ACTIVIDAD PRINCIPAL
 // ------------------------
 class HomePrincipalActivity : ComponentActivity() {
+    // Requiere API >= O (para LocalDate / LocalTime usados en calendarios)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Contenido Compose
         setContent {
             HomeApp()
         }
@@ -92,15 +102,17 @@ class HomePrincipalActivity : ComponentActivity() {
 }
 
 // ------------------------
-// Composable principal (Manejo de Estado CRUD)
+// COMPOSABLE RAÍZ - HomeApp
+// - Maneja el estado global de la pantalla (reservas) y navegación inferior
 // ------------------------
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeApp() {
+    // Estado para la pestaña seleccionada del BottomNav
     var selectedTab by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }
     val primaryColor = Color(0xFF1E3A8A)
 
-    // 1. Estado mutable para el CRUD de Reservas
+    // 1) Estado mutable tipo lista para las reservas (soporta CRUD)
     val reservasState = remember {
         mutableStateListOf(
             Reserva(cuidadoresList[0], "21/10/2025", "10:00 AM", 1),
@@ -108,17 +120,19 @@ fun HomeApp() {
             Reserva(cuidadoresList[2], "23/10/2025", "09:00 AM", 3)
         )
     }
-    // 2. Contador para generar IDs únicos
+
+    // 2) Contador simple para asignar IDs únicos a nuevas reservas
     var nextId by remember { mutableStateOf(4) }
 
-    // 3. Funciones CRUD que modifican el estado (pasadas a ReservaScreen)
+    // 3) FUNCIONES CRUD que modifican el estado (se pasan a ReservaScreen)
     val addReserva: (Reserva) -> Unit = { nuevaReserva ->
-        // Asigna el siguiente ID antes de añadir
+        // Copia la reserva y le asigna el siguiente id
         reservasState.add(nuevaReserva.copy(id = nextId))
         nextId++
     }
 
     val updateReserva: (Reserva) -> Unit = { reservaActualizada ->
+        // Busca por id y reemplaza en la lista
         val index = reservasState.indexOfFirst { it.id == reservaActualizada.id }
         if (index != -1) {
             reservasState[index] = reservaActualizada
@@ -126,14 +140,15 @@ fun HomeApp() {
     }
 
     val deleteReserva: (Reserva) -> Unit = { reservaAEliminar ->
+        // Remueve la reserva de la lista
         reservasState.remove(reservaAEliminar)
     }
 
+    // Scaffold con BottomBar (NavigationBar)
     Scaffold(
         bottomBar = {
             NavigationBar(containerColor = primaryColor) {
                 listOf(
-
                     BottomNavItem.Equipo,
                     BottomNavItem.Agenda,
                     BottomNavItem.Home,
@@ -150,16 +165,18 @@ fun HomeApp() {
             }
         }
     ) { paddingValues ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .background(Color.White)) {
+        // Contenedor principal que muestra la pantalla según la pestaña seleccionada
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color.White)
+        ) {
             when (selectedTab) {
                 BottomNavItem.Home -> HomeUsuarioScreen()
                 BottomNavItem.Equipo -> EspecialistasScreen()
                 BottomNavItem.Agenda -> AgendaScreen(reservas = reservasState)
                 BottomNavItem.Chat -> ChatScreen()
-
                 BottomNavItem.Reserva -> ReservaScreen(
                     reservas = reservasState,
                     onAddReserva = addReserva,
@@ -172,7 +189,7 @@ fun HomeApp() {
 }
 
 // ------------------------
-// 1️⃣ HomeUsuarioScreen
+// HomeUsuarioScreen - Pantalla principal del usuario
 // ------------------------
 @Composable
 fun HomeUsuarioScreen() {
@@ -180,20 +197,19 @@ fun HomeUsuarioScreen() {
     val secondaryColor = Color(0xFF475569)
     val backgroundColor = Color(0xFFF8FAFC)
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
             .padding(16.dp)
     ) {
-        HeaderUsuario()
-        // 🔹 Saludo y búsqueda
+        HeaderUsuario() // Cabecera con nombre
+        // Título y búsqueda
         Text("Encuentra tu especialista", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = primaryColor)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = "",
-            onValueChange = { /* búsqueda */ },
+            onValueChange = { /* búsqueda - actualmente mock */ },
             placeholder = { Text("Buscar por nombre, especialidad...") },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
@@ -201,13 +217,13 @@ fun HomeUsuarioScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🔹 Categorías
+        // Categorías (chips)
         Text("Categorías", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = primaryColor)
         Spacer(modifier = Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Adultos", "Niños", "Nutrición", "Domicilio").forEach { categoria ->
                 AssistChip(
-                    onClick = { /* filtrar */ },
+                    onClick = { /* filtrar - mock */ },
                     label = { Text(categoria) },
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = Color.White,
@@ -217,18 +233,11 @@ fun HomeUsuarioScreen() {
             }
         }
 
-
         Spacer(modifier = Modifier.height(24.dp))
-        ServiciosGrid()
+        ServiciosGrid() // Grid con servicios
         Spacer(modifier = Modifier.height(24.dp))
 
-// 🔹 Lista de especialistas
-        Text("Especialistas disponibles", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = primaryColor)
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 🔹 Lista de especialistas
+        // Lista rápida de especialistas (mock)
         Text("Especialistas disponibles", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = primaryColor)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -259,7 +268,7 @@ fun HomeUsuarioScreen() {
                             Text(rating, fontSize = 14.sp, color = Color(0xFFFB923C))
                         }
                         Button(
-                            onClick = { /* Agendar */ },
+                            onClick = { /* Agendar - mock */ },
                             colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
                         ) {
                             Text("Agendar", color = Color.White)
@@ -270,11 +279,10 @@ fun HomeUsuarioScreen() {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-
     }
 }
 
+// Botón de acción rápido (usado si quieres acciones de ancho completo)
 @Composable
 fun QuickActionButton(label: String, color: Color) {
     Button(
@@ -286,7 +294,9 @@ fun QuickActionButton(label: String, color: Color) {
     ) { Text(label, color = Color.White) }
 }
 
-
+// ------------------------
+// Pantalla: Especialistas (lista detallada con fotos)
+// ------------------------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EspecialistasScreen() {
@@ -302,17 +312,19 @@ fun EspecialistasScreen() {
         )
 
         LazyColumn {
+            // Recorre la lista mock de cuidadores
             items(cuidadoresList) { cuidador ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White) // fondo limpio
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Imagen circular del cuidador
                         Image(
                             painter = painterResource(id = cuidador.fotoRes),
                             contentDescription = cuidador.nombre,
@@ -331,7 +343,7 @@ fun EspecialistasScreen() {
                             Text(text = cuidador.especialidad)
                             Text(text = "Valoración: ${cuidador.valoracion}")
                             Button(
-                                onClick = { /* Agendar cita */ },
+                                onClick = { /* Agendar cita - mock */ },
                                 modifier = Modifier.padding(top = 8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
                             ) {
@@ -345,6 +357,9 @@ fun EspecialistasScreen() {
     }
 }
 
+// ------------------------
+// Pantalla: Agenda (muestra calendario y reservas del día seleccionado)
+// ------------------------
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AgendaScreen(reservas: List<Reserva>) {
@@ -359,7 +374,7 @@ fun AgendaScreen(reservas: List<Reserva>) {
         Text("Agenda de citas", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = primaryColor)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ** Calendario Básico Funcional **
+        // Composable que dibuja un calendario básico
         CalendarView(
             selectedDate = selectedDate,
             onDateSelected = { selectedDate = it }
@@ -367,7 +382,7 @@ fun AgendaScreen(reservas: List<Reserva>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Simulación de citas programadas para la fecha seleccionada
+        // Filtra las reservas que coinciden con la fecha seleccionada
         val reservasDelDia = remember(selectedDate, reservas) {
             reservas.filter { it.fecha == selectedDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) }
         }
@@ -387,7 +402,10 @@ fun AgendaScreen(reservas: List<Reserva>) {
                 }
             } else {
                 items(reservasDelDia) { reserva ->
-                    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E7FF))
                     ) {
                         Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -410,6 +428,9 @@ fun AgendaScreen(reservas: List<Reserva>) {
     }
 }
 
+// ------------------------
+// CalendarView - calendario simple (no dependencias externas)
+// ------------------------
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarView(selectedDate: LocalDate, onDateSelected: (LocalDate) -> Unit) {
@@ -417,22 +438,15 @@ fun CalendarView(selectedDate: LocalDate, onDateSelected: (LocalDate) -> Unit) {
     val currentMonth = selectedDate.withDayOfMonth(1)
     val daysInMonth = currentMonth.lengthOfMonth()
 
-    // El calendario comienza en Lunes para este ejemplo (1=Lunes, 7=Domingo)
-    // Se ajusta para que la primera celda vacía sea el desfase.
-    val firstDayOfWeek = currentMonth.dayOfWeek.value // 1 (Lunes) a 7 (Domingo)
-    val startOffset = if (firstDayOfWeek == 7) 6 else firstDayOfWeek - 1 // Desfase para empezar en la posición correcta
+    // Determina en qué columna comienza el mes (ajuste para Lunes como inicio)
+    val firstDayOfWeek = currentMonth.dayOfWeek.value // 1=Mon .. 7=Sun
+    val startOffset = if (firstDayOfWeek == 7) 6 else firstDayOfWeek - 1
 
-    val dayLabels = DayOfWeek.entries.map {
-        it.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-    }
-
-    // Cambiar la lista de días para que empiece en Lunes (si deseas Lunes-Domingo)
-    // Para el ejemplo, mantendremos la semana tal como la devuelve DayOfWeek (Lunes a Domingo)
-    // PERO si se requiere Domingo-Sábado:
+    // Etiquetas de día (puedes ajustar idioma/local)
     val dayLabelsFormatted = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Encabezado del Mes y Año
+        // Encabezado mes + año
         Text(
             currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).replaceFirstChar { it.titlecase() } +
                     " ${currentMonth.year}",
@@ -448,10 +462,10 @@ fun CalendarView(selectedDate: LocalDate, onDateSelected: (LocalDate) -> Unit) {
             }
         }
 
-        // Días del mes (Grid)
+        // Días del mes renderizados en filas por semanas
         Column {
             var dayCount = 1
-            for (week in 0 until 6) { // 6 semanas máx
+            for (week in 0 until 6) { // hasta 6 filas (algunas celdas quedarán vacías)
                 if (dayCount > daysInMonth && week > 0) break
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -480,7 +494,7 @@ fun CalendarView(selectedDate: LocalDate, onDateSelected: (LocalDate) -> Unit) {
                             }
                             dayCount++
                         } else {
-                            // Celdas vacías del principio o final del mes
+                            // Celdas vacías al inicio/final
                             Spacer(modifier = Modifier.size(36.dp))
                         }
                     }
@@ -491,16 +505,19 @@ fun CalendarView(selectedDate: LocalDate, onDateSelected: (LocalDate) -> Unit) {
     }
 }
 
-
-
+// ------------------------
+// ChatScreen - Chat básico con mensajes en memoria (mock)
+// ------------------------
 @Composable
 fun ChatScreen() {
     val primaryColor = Color(0xFF1E3A8A)
+    // Lista mutable de mensajes inicializada con un mensaje de bienvenida
     val messages = remember { mutableStateListOf(
         Message("¡Bienvenido al chat! ¿En qué podemos ayudarte hoy?", false)
     )}
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // Mensajes (lista desplazable)
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { message ->
                 Box(
@@ -522,6 +539,7 @@ fun ChatScreen() {
             }
         }
 
+        // Área de input y botón enviar
         Row(verticalAlignment = Alignment.CenterVertically) {
             var text by remember { mutableStateOf("") }
             TextField(
@@ -532,8 +550,8 @@ fun ChatScreen() {
             )
             IconButton(onClick = {
                 if (text.isNotBlank()) {
-                    messages.add(Message(text, true))
-                    text = ""
+                    messages.add(Message(text, true)) // añade mensaje enviado por usuario
+                    text = "" // limpia campo
                 }
             }) {
                 Icon(Icons.Default.Send, contentDescription = "Enviar", tint = primaryColor)
@@ -542,49 +560,51 @@ fun ChatScreen() {
     }
 }
 
-
+// ------------------------
+// ReservaScreen - CRUD de reservas (usa las funciones pasadas desde HomeApp)
+// ------------------------
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ReservaScreen(
-    reservas: List<Reserva>, // READ (Lectura)
-    onAddReserva: (Reserva) -> Unit, // CREATE (Crear)
-    onUpdateReserva: (Reserva) -> Unit, // UPDATE (Actualizar)
-    onDeleteReserva: (Reserva) -> Unit // DELETE (Eliminar)
+    reservas: List<Reserva>, // lista de lectura
+    onAddReserva: (Reserva) -> Unit, // callback para CREATE
+    onUpdateReserva: (Reserva) -> Unit, // callback para UPDATE
+    onDeleteReserva: (Reserva) -> Unit // callback para DELETE
 ) {
     val primaryColor = Color(0xFF1E3A8A)
-    var isDialogOpen by remember { mutableStateOf(false) }
-    var selectedReserva by remember { mutableStateOf<Reserva?>(null) } // Para edición (UPDATE)
+    var isDialogOpen by remember { mutableStateOf(false) } // controla si el diálogo de crear/editar está abierto
+    var selectedReserva by remember { mutableStateOf<Reserva?>(null) } // reserva seleccionada para editar
 
     Column(modifier = Modifier.padding(16.dp)) {
+        // Título y botón nueva reserva
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Mis Reservas", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = primaryColor)
-            // Botón para CREAR una nueva reserva
             Button(
                 onClick = {
-                selectedReserva = null // Indica que es una operación de creación
-                isDialogOpen = true
-            },
-
+                    selectedReserva = null // null => creación
+                    isDialogOpen = true
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = primaryColor,
                     contentColor = Color.White
                 )
-                ) {
+            ) {
                 Text("Nueva Reserva")
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // READ: Lista de reservas
+        // Lista de reservas (READ)
         LazyColumn {
             items(reservas, key = { it.id }) { reserva ->
-                Card(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
@@ -595,7 +615,7 @@ fun ReservaScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        // Información de la reserva
+                        // Info de reserva (imagen + texto)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
                                 painter = painterResource(id = reserva.cuidador.fotoRes),
@@ -610,18 +630,16 @@ fun ReservaScreen(
                             }
                         }
 
-                        // Botones de acción (UPDATE y DELETE)
+                        // Botones acción: editar y eliminar
                         Row {
-                            // UPDATE: Abrir diálogo para edición
                             IconButton(onClick = {
                                 selectedReserva = reserva
-                                isDialogOpen = true
+                                isDialogOpen = true // abre diálogo en modo edición
                             }) {
                                 Icon(Icons.Default.Edit, contentDescription = "Editar", tint = Color.Blue)
                             }
-                            // DELETE: Eliminar la reserva
                             IconButton(onClick = {
-                                onDeleteReserva(reserva)
+                                onDeleteReserva(reserva) // llama al callback delete
                             }) {
                                 Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color.Red)
                             }
@@ -632,18 +650,18 @@ fun ReservaScreen(
         }
     }
 
-
+    // DIALOG para crear / editar reserva
     if (isDialogOpen) {
         ReservaDialog(
             reserva = selectedReserva,
             onDismiss = { isDialogOpen = false },
             onSave = { cuidador, fecha, hora ->
                 if (selectedReserva == null) {
-                    // CREATE: id = 0 es temporal, se asigna en HomeApp
+                    // CREATE: id se asigna en HomeApp (se pasa id=0 temporal)
                     val newReserva = Reserva(cuidador, fecha, hora, 0)
                     onAddReserva(newReserva)
                 } else {
-                    // UPDATE: mantiene el id original
+                    // UPDATE: mantiene id original y reemplaza datos
                     val updatedReserva = selectedReserva!!.copy(cuidador = cuidador, fecha = fecha, hora = hora)
                     onUpdateReserva(updatedReserva)
                 }
@@ -653,7 +671,9 @@ fun ReservaScreen(
     }
 }
 
-
+// ------------------------
+// Dialogo para crear/editar Reserva
+// ------------------------
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -662,21 +682,21 @@ fun ReservaDialog(
     onDismiss: () -> Unit,
     onSave: (Cuidador, String, String) -> Unit
 ) {
+    // Estado local para cuidador seleccionado y campos de fecha/hora
     var selectedCuidador by remember {
         mutableStateOf(reserva?.cuidador ?: cuidadoresList.first())
     }
-    // Inicialización de campos con fecha/hora actual o datos de la reserva
     var fechaText by remember { mutableStateOf(reserva?.fecha ?: LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))) }
     var horaText by remember { mutableStateOf(reserva?.hora ?: LocalTime.now().withSecond(0).withNano(0).format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"))) }
     val dialogTitle = if (reserva == null) "Crear Nueva Reserva" else "Editar Reserva"
-
     val primaryColor = Color(0xFF1E3A8A)
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(dialogTitle, fontWeight = FontWeight.Bold) },
         text = {
             Column {
-                // Selector de Cuidador
+                // Selector desplegable de cuidadores
                 var expanded by remember { mutableStateOf(false) }
                 OutlinedTextField(
                     value = selectedCuidador.nombre,
@@ -703,15 +723,18 @@ fun ReservaDialog(
                 }
 
                 Spacer(Modifier.height(8.dp))
-                // Campo de Fecha
+
+                // Campo fecha (texto editable) - podrías cambiar por DatePicker
                 OutlinedTextField(
                     value = fechaText,
                     onValueChange = { fechaText = it },
                     label = { Text("Fecha (ej: 21/10/2025)") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 Spacer(Modifier.height(8.dp))
-                // Campo de Hora
+
+                // Campo hora (texto editable) - podrías cambiar por TimePicker
                 OutlinedTextField(
                     value = horaText,
                     onValueChange = { horaText = it },
@@ -726,17 +749,13 @@ fun ReservaDialog(
                     onSave(selectedCuidador, fechaText, horaText)
                 }
             },
-
                 colors = ButtonDefaults.buttonColors(
                     containerColor = primaryColor,
                     contentColor = Color.White
                 )
-
-
-                ) { Text("Guardar") }
+            ) { Text("Guardar") }
         },
         dismissButton = {
-
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(
@@ -746,11 +765,13 @@ fun ReservaDialog(
             ) {
                 Text("Cancelar")
             }
-
         }
     )
 }
 
+// ------------------------
+// HeaderUsuario - Cabecera con saludo y botón de perfil
+// ------------------------
 @Composable
 fun HeaderUsuario(nombre: String = "Emily Rupay") {
     val primaryColor = Color(0xFF1E3A8A)
@@ -769,8 +790,8 @@ fun HeaderUsuario(nombre: String = "Emily Rupay") {
             Text("Cliente", fontSize = 14.sp, color = Color.Gray)
         }
 
-        // Icono de perfil o configuración
-        IconButton(onClick = { /* Abrir perfil o ajustes */ }) {
+        // Icono perfil (acción mock)
+        IconButton(onClick = { /* Abrir perfil o ajustes - pendiente */ }) {
             Icon(
                 imageVector = Icons.Filled.Person,
                 contentDescription = "Perfil",
@@ -781,6 +802,9 @@ fun HeaderUsuario(nombre: String = "Emily Rupay") {
     }
 }
 
+// ------------------------
+// ServiciosGrid - Grid con servicios ofrecidos
+// ------------------------
 @Composable
 fun ServiciosGrid() {
     val primaryColor = Color(0xFF1E3A8A)
@@ -805,15 +829,12 @@ fun ServiciosGrid() {
     ) {
         items(servicios) { (titulo, icono) ->
             Card(
-                modifier = Modifier
-                    .size(100.dp),
+                modifier = Modifier.size(100.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
+                    modifier = Modifier.fillMaxSize().padding(8.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
