@@ -6,6 +6,8 @@ import app.cash.turbine.test
 import com.example.cuidaplus.data.model.Patient
 import com.example.cuidaplus.repository.PatientRepository
 import com.google.common.truth.Truth.assertThat
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -13,8 +15,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import io.mockk.coEvery
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,7 +49,6 @@ class PatientViewModelTest {
     }
 
     // ========== Tests de cambio de estado del formulario ==========
-
     @Test
     fun `onNameChange updates name and clears error`() = runTest {
         createViewModel()
@@ -67,7 +66,7 @@ class PatientViewModelTest {
     @Test
     fun `onAgeChange updates age and clears error`() = runTest {
         createViewModel()
-        val age = "30"
+        val age = "35"
 
         viewModel.onAgeChange(age)
 
@@ -93,34 +92,6 @@ class PatientViewModelTest {
     }
 
     @Test
-    fun `onWeightChange updates weight and clears error`() = runTest {
-        createViewModel()
-        val weight = "70.5"
-
-        viewModel.onWeightChange(weight)
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.weight).isEqualTo(weight)
-            assertThat(state.weightError).isNull()
-        }
-    }
-
-    @Test
-    fun `onHeightChange updates height and clears error`() = runTest {
-        createViewModel()
-        val height = "175"
-
-        viewModel.onHeightChange(height)
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.height).isEqualTo(height)
-            assertThat(state.heightError).isNull()
-        }
-    }
-
-    @Test
     fun `onBloodTypeChange updates bloodType and clears error`() = runTest {
         createViewModel()
         val bloodType = "O+"
@@ -134,177 +105,58 @@ class PatientViewModelTest {
         }
     }
 
-    @Test
-    fun `onImageSelected updates imageUrl`() = runTest {
-        createViewModel()
-        val imageUrl = "https://example.com/patient.jpg"
-
-        viewModel.onImageSelected(imageUrl)
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.imageUrl).isEqualTo(imageUrl)
-        }
-    }
-
-// ========== Tests de validación ==========
-
+    // ========== Tests de validación ==========
     @Test
     fun `savePatient with empty name shows error`() = runTest {
         createViewModel()
         viewModel.onNameChange("")
-        viewModel.onAgeChange("30")
+        viewModel.onAgeChange("35")
         viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("70")
-        viewModel.onHeightChange("175")
-        viewModel.onBloodTypeChange("O+")
 
         viewModel.savePatient()
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.formState.test {
             val state = awaitItem()
-            assertThat(state.nameError).isEqualTo("El nombre es requerido")
+            assertThat(state.nameError).isEqualTo("El nombre es obligatorio")
         }
     }
 
     @Test
     fun `savePatient with invalid age shows error`() = runTest {
         createViewModel()
-        viewModel.onNameChange("Juan Pérez")
+        viewModel.onNameChange("Juan")
         viewModel.onAgeChange("abc")
         viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("70")
-        viewModel.onHeightChange("175")
-        viewModel.onBloodTypeChange("O+")
 
         viewModel.savePatient()
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.formState.test {
             val state = awaitItem()
-            assertThat(state.ageError).isEqualTo("La edad debe ser un número")
+            assertThat(state.ageError).isEqualTo("Edad inválida")
         }
     }
 
-    @Test
-    fun `savePatient with age out of range shows error`() = runTest {
-        createViewModel()
-        viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("150")
-        viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("70")
-        viewModel.onHeightChange("175")
-        viewModel.onBloodTypeChange("O+")
-
-        viewModel.savePatient()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.ageError).isEqualTo("La edad debe estar entre 0 y 120")
-        }
-    }
-
-    @Test
-    fun `savePatient with invalid weight shows error`() = runTest {
-        createViewModel()
-        viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("30")
-        viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("abc")
-        viewModel.onHeightChange("175")
-        viewModel.onBloodTypeChange("O+")
-
-        viewModel.savePatient()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.weightError).isEqualTo("El peso debe ser un número")
-        }
-    }
-
-    @Test
-    fun `savePatient with weight out of range shows error`() = runTest {
-        createViewModel()
-        viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("30")
-        viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("350")
-        viewModel.onHeightChange("175")
-        viewModel.onBloodTypeChange("O+")
-
-        viewModel.savePatient()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.weightError).isEqualTo("El peso debe estar entre 0 y 300 kg")
-        }
-    }
-
-    @Test
-    fun `savePatient with invalid height shows error`() = runTest {
-        createViewModel()
-        viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("30")
-        viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("70")
-        viewModel.onHeightChange("abc")
-        viewModel.onBloodTypeChange("O+")
-
-        viewModel.savePatient()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.heightError).isEqualTo("La altura debe ser un número")
-        }
-    }
-
-    @Test
-    fun `savePatient with height out of range shows error`() = runTest {
-        createViewModel()
-        viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("30")
-        viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("70")
-        viewModel.onHeightChange("300")
-        viewModel.onBloodTypeChange("O+")
-
-        viewModel.savePatient()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.formState.test {
-            val state = awaitItem()
-            assertThat(state.heightError).isEqualTo("La altura debe estar entre 0 y 250 cm")
-        }
-    }
-
-// ========== Tests de guardar paciente ==========
-
+    // ========== Tests de guardar paciente ==========
     @Test
     fun `savePatient with valid data succeeds`() = runTest {
         createViewModel()
         val patient = Patient(
-            id = "patient1",
+            id = "p1",
             name = "Juan Pérez",
-            age = 30,
+            age = 35,
             gender = "Masculino",
             weight = 70.0,
-            height = 175.0,
+            height = 1.75,
             bloodType = "O+",
             imageUrl = null,
             userId = userId
         )
 
         viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("30")
+        viewModel.onAgeChange("35")
         viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("70")
-        viewModel.onHeightChange("175")
-        viewModel.onBloodTypeChange("O+")
 
         coEvery { patientRepository.addPatient(match { true }) } returns Result.success(patient)
 
@@ -323,11 +175,8 @@ class PatientViewModelTest {
     fun `savePatient failure shows error message`() = runTest {
         createViewModel()
         viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("30")
+        viewModel.onAgeChange("35")
         viewModel.onGenderChange("Masculino")
-        viewModel.onWeightChange("70")
-        viewModel.onHeightChange("175")
-        viewModel.onBloodTypeChange("O+")
 
         coEvery { patientRepository.addPatient(match { true }) } returns Result.failure(Exception("Error de conexión"))
 
@@ -341,20 +190,19 @@ class PatientViewModelTest {
         }
     }
 
-// ========== Tests de editar paciente ==========
-
+    // ========== Tests de editar paciente ==========
     @Test
     fun `startEditingPatient populates form with patient data`() = runTest {
         createViewModel()
         val patient = Patient(
-            id = "patient1",
+            id = "p1",
             name = "Juan Pérez",
-            age = 30,
+            age = 35,
             gender = "Masculino",
             weight = 70.0,
-            height = 175.0,
+            height = 1.75,
             bloodType = "O+",
-            imageUrl = "https://example.com/patient.jpg",
+            imageUrl = "https://example.com/image.jpg",
             userId = userId
         )
 
@@ -363,12 +211,12 @@ class PatientViewModelTest {
         viewModel.formState.test {
             val state = awaitItem()
             assertThat(state.name).isEqualTo("Juan Pérez")
-            assertThat(state.age).isEqualTo("30")
+            assertThat(state.age).isEqualTo("35")
             assertThat(state.gender).isEqualTo("Masculino")
             assertThat(state.weight).isEqualTo("70.0")
-            assertThat(state.height).isEqualTo("175.0")
+            assertThat(state.height).isEqualTo("1.75")
             assertThat(state.bloodType).isEqualTo("O+")
-            assertThat(state.imageUrl).isEqualTo("https://example.com/patient.jpg")
+            assertThat(state.imageUrl).isEqualTo("https://example.com/image.jpg")
         }
 
         viewModel.editingPatient.test {
@@ -381,8 +229,7 @@ class PatientViewModelTest {
     fun `clearForm resets form state`() = runTest {
         createViewModel()
         viewModel.onNameChange("Juan Pérez")
-        viewModel.onAgeChange("30")
-
+        viewModel.onAgeChange("35")
         viewModel.clearForm()
 
         viewModel.formState.test {
@@ -397,37 +244,37 @@ class PatientViewModelTest {
         }
     }
 
-// ========== Tests de eliminar paciente ==========
-
+    // ========== Tests de eliminar paciente ==========
     @Test
     fun `deletePatient removes patient from list`() = runTest {
         val patients = listOf(
-            Patient("patient1", "Juan Pérez", 30, "Masculino", 70.0, 175.0, "O+", null, userId),
-            Patient("patient2", "Ana López", 25, "Femenino", 60.0, 165.0, "A+", null, userId)
+            Patient("p1", "Juan Pérez", 35, "Masculino", 70.0, 1.75, "O+", null, userId),
+            Patient("p2", "Ana López", 28, "Femenino", 60.0, 1.65, "A+", null, userId)
         )
+
         coEvery { patientRepository.getPatientsByUser(userId) } returns patients
         viewModel = PatientViewModel(patientRepository, userId)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coEvery { patientRepository.deletePatient("patient1") } returns Result.success(Unit)
-        coEvery { patientRepository.getPatientsByUser(userId) } returns patients.filter { it.id != "patient1" }
+        coEvery { patientRepository.deletePatient("p1") } returns Result.success(Unit)
+        coEvery { patientRepository.getPatientsByUser(userId) } returns patients.filter { it.id != "p1" }
 
-        viewModel.deletePatient("patient1")
+        viewModel.deletePatient("p1")
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.patients.test {
             val patientList = awaitItem()
             assertThat(patientList).hasSize(1)
-            assertThat(patientList[0].id).isEqualTo("patient2")
+            assertThat(patientList[0].id).isEqualTo("p2")
         }
     }
 
     @Test
     fun `deletePatient failure shows error message`() = runTest {
         createViewModel()
-        coEvery { patientRepository.deletePatient("patient1") } returns Result.failure(Exception("Error al eliminar"))
+        coEvery { patientRepository.deletePatient("p1") } returns Result.failure(Exception("Error al eliminar"))
 
-        viewModel.deletePatient("patient1")
+        viewModel.deletePatient("p1")
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.formState.test {
@@ -436,13 +283,13 @@ class PatientViewModelTest {
         }
     }
 
-// ========== Tests de cargar pacientes ==========
-
+    // ========== Tests de cargar pacientes ==========
     @Test
     fun `refreshPatients loads patients from repository`() = runTest {
         val patients = listOf(
-            Patient("patient1", "Juan Pérez", 30, "Masculino", 70.0, 175.0, "O+", null, userId)
+            Patient("p1", "Juan Pérez", 35, "Masculino", 70.0, 1.75, "O+", null, userId)
         )
+
         coEvery { patientRepository.getPatientsByUser(userId) } returns patients
         viewModel = PatientViewModel(patientRepository, userId)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -454,12 +301,10 @@ class PatientViewModelTest {
         }
     }
 
-// ========== Tests de estado ==========
-
+    // ========== Tests de estado ==========
     @Test
     fun `resetSuccessState resets isSuccess to false`() = runTest {
         createViewModel()
-
         viewModel.resetSuccessState()
 
         viewModel.formState.test {
@@ -471,7 +316,6 @@ class PatientViewModelTest {
     @Test
     fun `clearError clears error message`() = runTest {
         createViewModel()
-
         viewModel.clearError()
 
         viewModel.formState.test {

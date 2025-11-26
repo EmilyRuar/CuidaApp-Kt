@@ -7,14 +7,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.cuidaplus.ui.theme.CuidaplusTheme
+import androidx.navigation.compose.rememberNavController
 import com.example.cuidaplus.navigation.NavGraph
+import com.example.cuidaplus.ui.theme.CuidaplusTheme
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -23,16 +21,23 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            // ✅ Aplicamos el tema global
             CuidaplusTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // ✅ Llamamos a tu NavGraph con BottomNavigation
-                    NavGraph()
+                    // ✅ Inicializamos NavController
+                    val navController = rememberNavController()
+
+                    // ✅ Llamamos al NavGraph con la ruta inicial
+                    NavGraph(
+                        navController = navController,
+                        startDestination = "login"
+                    )
                 }
             }
         }
     }
 }
+
+

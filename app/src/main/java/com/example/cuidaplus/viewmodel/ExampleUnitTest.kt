@@ -1,4 +1,4 @@
-package com.example.pethome
+package com.example.Cuidaplus
 
 import org.junit.Test
 

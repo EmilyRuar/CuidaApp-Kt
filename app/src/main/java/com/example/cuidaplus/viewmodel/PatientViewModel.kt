@@ -1,3 +1,4 @@
+
 package com.example.cuidaplus.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -6,10 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cuidaplus.data.model.Patient
 import com.example.cuidaplus.repository.PatientRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class PatientFormState(
@@ -34,7 +32,6 @@ data class PatientFormState(
     val errorMessage: String? = null,
     val isSuccess: Boolean = false
 )
-
 
 class PatientViewModel(
     private val patientRepository: PatientRepository,
@@ -71,15 +68,15 @@ class PatientViewModel(
     fun refreshPatients() = loadPatients()
 
     // Actualización de campos
-    fun onNameChange(name: String) { _formState.update { it.copy(name = name, nameError = null) } }
-    fun onAgeChange(age: String) { _formState.update { it.copy(age = age, ageError = null) } }
-    fun onGenderChange(gender: String) { _formState.update { it.copy(gender = gender, genderError = null) } }
-    fun onWeightChange(weight: String) { _formState.update { it.copy(weight = weight, weightError = null) } }
-    fun onHeightChange(height: String) { _formState.update { it.copy(height = height, heightError = null) } }
-    fun onBloodTypeChange(bloodType: String) { _formState.update { it.copy(bloodType = bloodType, bloodTypeError = null) } }
-    fun onImageSelected(imageUri: String?) { _formState.update { it.copy(imageUrl = imageUri) } }
+    fun onNameChange(name: String) = _formState.update { it.copy(name = name, nameError = null) }
+    fun onAgeChange(age: String) = _formState.update { it.copy(age = age, ageError = null) }
+    fun onGenderChange(gender: String) = _formState.update { it.copy(gender = gender, genderError = null) }
+    fun onWeightChange(weight: String) = _formState.update { it.copy(weight = weight, weightError = null) }
+    fun onHeightChange(height: String) = _formState.update { it.copy(height = height, heightError = null) }
+    fun onBloodTypeChange(bloodType: String) = _formState.update { it.copy(bloodType = bloodType, bloodTypeError = null) }
+    fun onImageSelected(imageUri: String?) = _formState.update { it.copy(imageUrl = imageUri) }
 
-    fun clearError() { _formState.update { it.copy(errorMessage = null) } }
+    fun clearError() = _formState.update { it.copy(errorMessage = null) }
 
     fun startEditingPatient(patient: Patient) {
         _editingPatient.value = patient
@@ -101,9 +98,7 @@ class PatientViewModel(
         _formState.value = PatientFormState()
     }
 
-    fun resetSuccessState() {
-        _formState.update { it.copy(isSuccess = false) }
-    }
+    fun resetSuccessState() = _formState.update { it.copy(isSuccess = false) }
 
     fun savePatient() {
         if (!validateForm()) return
@@ -162,5 +157,37 @@ class PatientViewModel(
                 _formState.update { it.copy(errorMessage = "Error al eliminar paciente: ${e.message}") }
             }
         }
-    } }
+    }
 
+    private fun validateForm(): Boolean {
+        var isValid = true
+        val current = _formState.value
+
+        if (current.name.isBlank()) {
+            _formState.update { it.copy(nameError = "El nombre es obligatorio") }
+            isValid = false
+        }
+        if (current.age.isBlank() || current.age.toIntOrNull() == null) {
+            _formState.update { it.copy(ageError = "Edad inválida") }
+            isValid = false
+        }
+        if (current.gender.isBlank()) {
+            _formState.update { it.copy(genderError = "Selecciona un género") }
+            isValid = false
+        }
+        return isValid
+    }
+}
+
+class PatientViewModelFactory(
+    private val patientRepository: PatientRepository,
+    private val userId: String
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PatientViewModel::class.java)) {
+            return PatientViewModel(patientRepository, userId) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

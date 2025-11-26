@@ -24,7 +24,7 @@ fun EspecialistasScreen() {
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            text = "Especialistas",
+            text = "Especialist@s",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = primaryColor,
