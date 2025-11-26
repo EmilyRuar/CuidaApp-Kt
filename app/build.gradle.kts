@@ -1,9 +1,9 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("kapt")
-    id("com.google.devtools.ksp") version "2.0.20-1.0.24"
+    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
 }
 
 android {
@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.cuidaplus"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -42,16 +42,38 @@ android {
 }
 
 dependencies {
-    implementation("androidx.navigation:navigation-compose:2.8.0")
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
-    /////
-    val room_version = "2.8.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
-    /////
-    implementation("androidx.compose.material3:material3:1.3.1")
-    implementation("androidx.compose.material:material-icons-extended:1.4.0")
+    // Jetpack Compose
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    // Navigation Compose
+    implementation("androidx.navigation:navigation-compose:2.8.5")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.8.5")
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // Room Database
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+
+    // Retrofit (para API)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // OkHttp (para interceptores y logging)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Coil para cargar imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Core AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -60,19 +82,23 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.airbnb.lottie)
+
+    // Testing - Unit Tests
     testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("app.cash.turbine:turbine:1.0.0")
+    testImplementation("com.google.truth:truth:1.1.5")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // Testing - Instrumented Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Debug
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-
-
 }
