@@ -1,63 +1,130 @@
-**🌟 CuidApp de Gestión de Cuidadores y Reservas**
+💙 Cuidaplus App – Kotlin + Jetpack Compose
+<p align="center"> <img src="https://img.shields.io/badge/Kotlin-1.9-blue?logo=kotlin" /> <img src="https://img.shields.io/badge/Jetpack%20Compose-UI-green?logo=android" /> <img src="https://img.shields.io/badge/Architecture-MVVM-orange" /> <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" /> </p>
+🐾 CuidaPlus: Tu app para conectar con especialistas y servicios de cuidado
 
-Cuidaplus es una aplicación móvil desarrollada en Kotlin utilizando Jetpack Compose. Está diseñada para que los usuarios puedan buscar especialistas, agendar citas, gestionar reservas, consultar su agenda y comunicarse vía chat de manera intuitiva y eficiente.
+Cuidaplus es una aplicación móvil desarrollada en Kotlin utilizando Jetpack Compose, diseñada para facilitar la búsqueda de especialistas, agendamiento de citas y gestión de servicios para el cuidado de tus seres queridos (personas mayores, pacientes, mascotas u otros).
 
-La aplicación ofrece una experiencia moderna, responsive y centrada en el usuario, ideal para servicios de cuidado de adultos mayores, niños y asistencia domiciliaria.
+✨ Características principales
+✅ Navegación moderna
 
-**🚀 Características principales**
+Uso de Navigation Compose
 
-Home del usuario: panel con búsqueda de especialistas y servicios destacados.
+Arquitectura limpia con NavGraph y BottomNavigation
 
-Lista de especialistas: vista detallada con fotos, especialidad y valoración.
+👩‍⚕️ Pantalla de Especialistas
 
-Agenda: calendario interactivo para visualizar reservas por día.
+Lista de especialistas con:
 
-Reservas CRUD: crear, editar y eliminar citas de manera dinámica.
+Foto
 
-Chat básico: comunicación directa con mensajes simulados en memoria.
+Especialidad
 
-Servicios ofrecidos: grid con los principales servicios como teleconsulta, laboratorio, medicinas, vacunas y más.
+Valoración
 
-Bottom Navigation: navegación sencilla entre las secciones principales de la app.
+Botón para agendar cita
 
-**🛠️ Tecnologías utilizadas**
+📅 Agenda
 
-Kotlin – Lenguaje principal para Android.
+Vista para revisar citas programadas
 
-Jetpack Compose – Framework moderno para UI declarativa.
+Componentes modulares en ui/agenda/components
 
-Material 3 Components – Diseño y componentes interactivos de Material Design.
+💬 Chat
 
-API >= 26 – Requerida para manejo de fechas y horas (LocalDate, LocalTime).
+Interfaz inicial para mensajería entre paciente y especialista
 
-Android Studio – IDE recomendado para desarrollo y pruebas.
+🎨 Tema personalizado
 
-**📂 Estructura del proyecto**
+Implementación completa en Material 3
 
-models/ – Clases de datos (Cuidador, Reserva, Message).
+Paleta de colores propia
 
-ui/screens/ – Composables de cada pantalla: Home, Especialistas, Agenda, Chat, Reservas.
+Tipografía profesional
 
-ui/components/ – Componentes reutilizables como HeaderUsuario, ServiciosGrid, ReservaDialog.
+🧱 Arquitectura MVVM
 
-data/ – Datos locales de prueba (cuidadoresList).
+Repositorios separados
 
-HomePrincipalActivity.kt – Actividad principal que inicia la app y maneja la navegación.
+ViewModels desacoplados
 
-**⚡ Funcionalidad destacada**
+Estructura escalable
 
-CRUD de reservas: permite crear nuevas reservas, editar y eliminar existentes.
+🏛 Estructura del Proyecto
+com.example.cuidaplus
+│
+├── data/                   # Modelos y listas locales
+│
+├── navigation/             # NavGraph y navegación inferior
+│   ├── BottomNavItem.kt
+│   └── NavGraph.kt
+│
+├── repository/             # Repositorios (Auth, Pacientes, Servicios)
+│
+├── ui/
+│   ├── agenda/
+│   │   └── components/     # UI modular de Agenda
+│   │       └── AgendaScreen.kt
+│   ├── chat/
+│   │   └── ChatScreen.kt
+│   ├── especialistas/
+│   │   └── EspecialistasScreen.kt
+│   ├── home/
+│   ├── reserva/
+│   └── theme/              # Tema Material 3
+│       ├── Color.kt
+│       ├── Theme.kt
+│       └── Type.kt
+│
+├── util/                   # Helpers y extensiones
+│
+├── viewmodel/              # ViewModels según módulo
+│
+└── MainActivity.kt         # Punto de entrada con Compose
 
-Calendario interactivo: selección de fechas y visualización de reservas por día.
+📱 Tecnologías utilizadas
+Tecnología	Uso
+Kotlin	Lógica y arquitectura
+Jetpack Compose	UI declarativa moderna
+Material 3	Tema visual elegante
+Navigation Compose	Navegación estructurada
+MVVM	Arquitectura limpia y escalable
+🚀 Instalación y ejecución
+1️⃣ Clonar el repositorio
+git clone https://github.com/EmilyRuar/CuidaApp-Kt.git
 
-Lista de especialistas filtrable: integración de búsqueda y categorización.
+2️⃣ Abrir en Android Studio
 
-Interfaz moderna y responsive: uso de LazyColumn, LazyVerticalGrid y Material Components.
+Abrir Android Studio
 
-**📌 Requisitos**
+Seleccionar Open an existing project
 
-Android Studio 2022 o superior.
+Buscar la carpeta Cuidaplus
 
-Dispositivo o emulador con Android 8.0 (API 26) o superior.
+3️⃣ Ejecutar
 
-Recursos de imágenes (res/drawable) para los cuidadores listados.
+Seleccionar un emulador o dispositivo físico
+
+Presionar ▶️ Run
+
+🔧 Actualizar tu proyecto en GitHub
+Subir cambios:
+git add .
+git commit -m "Actualización del proyecto Cuidaplus"
+git push origin main
+
+🛠 Próximas mejoras
+
+🔐 Pantalla de login + autenticación real
+
+📍 Ubicación y geolocalización de especialistas
+
+📆 Sistema avanzado de reservas
+
+🔔 Notificaciones push
+
+👤 Autora
+
+Emily Rupay
+Community Manager & Mobile Developer
+📍 Chile
+✨ Construyendo experiencias móviles con Kotlin + Compose
