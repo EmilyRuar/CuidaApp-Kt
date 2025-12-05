@@ -1,43 +1,39 @@
-
 package com.example.cuidaplus
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
-import androidx.compose.ui.Modifier
+import androidx.activity.viewModels
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import androidx.core.view.WindowCompat
 import com.example.cuidaplus.navigation.NavGraph
+import com.example.cuidaplus.navigation.Screen
 import com.example.cuidaplus.ui.theme.CuidaplusTheme
+import com.example.cuidaplus.viewmodel.PatientViewModel
 
 class MainActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
             CuidaplusTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    // ✅ Inicializamos NavController
-                    val navController = rememberNavController()
 
-                    // ✅ Llamamos al NavGraph con la ruta inicial
-                    NavGraph(
-                        navController = navController,
-                        startDestination = "login"
-                    )
-                }
+
+
+                // Crear NavController
+                val navController = rememberNavController()
+
+                // Llamar a tu NavGraph REAL
+                NavGraph(
+                    navController = navController,
+                    startDestination = Screen.Login.route   // 👈 ARRANCA
+                )
             }
         }
     }
 }
-
-

@@ -1,10 +1,13 @@
 package com.example.cuidaplus.ui.home
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,144 +16,172 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cuidaplus.ui.home.components.ServiciosGrid
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onServiciosClick: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val primaryColor = Color(0xFF1E3A8A)
-    val secondaryColor = Color(0xFF475569)
-    val backgroundColor = Color(0xFFF0F4FF)
+    val primaryColor = Color(0xFF2563EB)
+    val backgroundColor = Color(0xFFF8FAFC)
 
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(16.dp)
-    ) {
+    Scaffold(
+        bottomBar = {
+            NavigationBar(containerColor = Color.White) {
 
-        // ---------- HEADER ----------
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Equipo") },
+                    label = { Text("Equipo") },
+                    selected = false,
+                    onClick = {
+                        // Si quieres navegar aquí, luego lo agregamos.
+                    }
+                )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Agenda") },
+                    label = { Text("Agenda") },
+                    selected = false,
+                    onClick = {
+                        onServiciosClick() // si tu agenda está en servicios
+                    }
+                )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
+                    label = { Text("Home") },
+                    selected = true, // <-- pantalla activa
+                    onClick = {}
+                )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Chat, contentDescription = "Chat") },
+                    label = { Text("Chat") },
+                    selected = false,
+                    onClick = {
+                        // próximamente
+                    }
+                )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.List, contentDescription = "Reservas") },
+                    label = { Text("Reserva") },
+                    selected = false,
+                    onClick = {
+                        onServiciosClick() // se puede separar luego
+                    }
+                )
+            }
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor)
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            Column {
-                Text("Bienvenido 👋", fontSize = 18.sp, color = secondaryColor)
-                Text(
-                    "¿Qué necesitas hoy?",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = primaryColor
+
+            // ---------- HEADER ----------
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text("Bienvenido 👋", fontSize = 18.sp, color = Color.Gray)
+                    Text(
+                        "Explora nuestros servicios",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
+                    )
+                }
+
+                Icon(
+                    Icons.Default.AccountCircle,
+                    contentDescription = "Usuario",
+                    tint = primaryColor,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable { showLogoutDialog = true } // ← mismo comportamiento que antes
                 )
             }
 
-            Icon(
-                Icons.Default.AccountCircle,
-                contentDescription = "Usuario",
-                tint = primaryColor,
-                modifier = Modifier
-                    .size(42.dp)
-                    .clickable { showLogoutDialog = true }
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            // ---------- BUSCADOR ----------
+            OutlinedTextField(
+                value = "",
+                onValueChange = { },
+                placeholder = { Text("Buscar servicios o pacientes...") },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
             )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ---------- BUSCADOR ----------
-        OutlinedTextField(
-            value = "",
-            onValueChange = { },
-            placeholder = { Text("Buscar servicio, cuidado, atención...") },
-            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
 
-        // ---------- BOTÓN SERVICIOS ----------
-        Button(
-            onClick = { onServiciosClick() },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-            shape = RoundedCornerShape(14.dp)
-        ) {
-            Icon(Icons.Default.List, contentDescription = null, tint = Color.White)
-            Spacer(Modifier.width(8.dp))
-            Text("Nuestros Servicios", color = Color.White, fontSize = 16.sp)
-        }
+            // ---------- SERVICIOS DESTACADOS ----------
+            Text(
+                "Servicios destacados",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = primaryColor
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-
-        // ---------- RESEÑAS ----------
-        Text(
-            "Clientes Satisfechos",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = primaryColor
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val reseñas = listOf(
-            Triple("Carolina S.", "Excelente atención, muy profesionales y cariñosos con mi mamá.", 5),
-            Triple("Diego P.", "Servicio rápido, confiable y el cuidador fue muy puntual.", 4),
-            Triple("Marcela R.", "Gran experiencia, recomiendo totalmente.", 5)
-        )
-
-        LazyColumn {
-            items(reseñas) { (nombre, comentario, estrellas) ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(3.dp),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(nombre, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = primaryColor)
-                        Text(comentario, fontSize = 14.sp, color = secondaryColor)
-
-                        Spacer(Modifier.height(6.dp))
-
-                        Row {
-                            repeat(estrellas) {
-                                Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107))
-                            }
+            LazyVerticalGrid(
+                columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(2),
+                modifier = Modifier.fillMaxHeight(),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(
+                    listOf(
+                        "Cuidado en casa",
+                        "Atención médica",
+                        "Rehabilitación",
+                        "Asesoría nutricional"
+                    )
+                ) { servicio ->
+                    Card(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                            .clickable { onServiciosClick() },
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Default.HealthAndSafety,
+                                contentDescription = null,
+                                tint = primaryColor,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(servicio, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
                     }
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ---------- REDES SOCIALES ----------
-        Text(
-            "Síguenos en redes",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = primaryColor
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Icon(Icons.Default.Facebook, contentDescription = null, tint = primaryColor, modifier = Modifier.size(32.dp))
-            Icon(Icons.Default.Share, contentDescription = null, tint = primaryColor, modifier = Modifier.size(32.dp))
-            Icon(Icons.Default.Phone, contentDescription = null, tint = primaryColor, modifier = Modifier.size(32.dp))
-        }
     }
+
 
     // ---------- DIALOGO DE CERRAR SESIÓN ----------
     if (showLogoutDialog) {

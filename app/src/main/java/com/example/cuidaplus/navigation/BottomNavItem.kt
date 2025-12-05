@@ -10,4 +10,5 @@ sealed class BottomNavItem(val label: String, val icon: ImageVector) {
     object Home : BottomNavItem("Home", Icons.Filled.Home)
     object Chat : BottomNavItem("Chat", Icons.Filled.Chat)
     object Reserva : BottomNavItem("Reserva", Icons.Filled.List)
+
 }

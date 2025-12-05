@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import com.example.cuidaplus.viewmodel.LoginViewModel
 
+
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
@@ -43,11 +44,8 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)) // Color gris claro, puedes cambiarlo
+            .background(Color(0xFFF5F5F5))
     ) {
-
-
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -56,14 +54,16 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo Cuidaplus
+            // Logo
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Cuidaplus Logo",
                 modifier = Modifier.size(200.dp)
             )
 
-            // Campo de correo
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Campo correo
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = { viewModel.onEmailChange(it) },
@@ -71,29 +71,19 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = uiState.emailError != null,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF5B7FDB),
                     unfocusedBorderColor = Color.Black.copy(alpha = 0.3f)
                 )
             )
             if (uiState.emailError != null) {
-                Text(
-                    text = uiState.emailError!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, top = 4.dp)
-                )
+                Text(uiState.emailError!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campo de contraseña
+            // Campo contraseña
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = { viewModel.onPasswordChange(it) },
@@ -102,36 +92,23 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                isError = uiState.passwordError != null,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { viewModel.login() }
-                ),
                 trailingIcon = {
                     IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                         Icon(
                             imageVector = if (uiState.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (uiState.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            contentDescription = null
                         )
                     }
                 },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { viewModel.login() }),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF5B7FDB),
                     unfocusedBorderColor = Color.Black.copy(alpha = 0.3f)
                 )
             )
             if (uiState.passwordError != null) {
-                Text(
-                    text = uiState.passwordError!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, top = 4.dp)
-                )
+                Text(uiState.passwordError!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -139,9 +116,7 @@ fun LoginScreen(
             // Botón Ingresar
             Button(
                 onClick = { viewModel.login() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5B7FDB)),
                 shape = RoundedCornerShape(8.dp),
                 enabled = !uiState.isLoading
@@ -149,40 +124,46 @@ fun LoginScreen(
                 if (uiState.isLoading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                 } else {
-                    Text(text = "Ingresar", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Text("Ingresar", fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ✅ Aviso de credenciales demo
+            Text(
+                text = "Modo demo: demo@gmail.com / 123456",
+                color = Color.Gray,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(top = 8.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Botón Crear Usuario
             OutlinedButton(
                 onClick = onNavigateToRegister,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
                 border = BorderStroke(1.dp, Color(0xFF5B7FDB)),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text(text = "Crear Usuario", color = Color(0xFF5B7FDB), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("Crear Usuario", color = Color(0xFF5B7FDB), fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Recuperar contraseña
             TextButton(onClick = onNavigateToForgotPassword) {
-                Text(text = "Recuperar Contraseña", color = Color(0xFF5B7FDB), fontSize = 14.sp)
+                Text("Recuperar Contraseña", color = Color(0xFF5B7FDB), fontSize = 14.sp)
                 Spacer(modifier = Modifier.width(4.dp))
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = Color(0xFF5B7FDB), modifier = Modifier.size(16.dp))
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = Color(0xFF5B7FDB))
             }
         }
 
-        // Mostrar error general si existe
+        // Snackbar para errores
         if (uiState.errorMessage != null) {
             Snackbar(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
+                modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
                 action = {
                     TextButton(onClick = { viewModel.clearError() }) {
                         Text("OK", color = Color.White)
@@ -194,7 +175,7 @@ fun LoginScreen(
         }
     }
 
-    // Observar login exitoso
+    // Navegación si login exitoso
     LaunchedEffect(uiState.isLoginSuccessful) {
         if (uiState.isLoginSuccessful) {
             onLoginSuccess()

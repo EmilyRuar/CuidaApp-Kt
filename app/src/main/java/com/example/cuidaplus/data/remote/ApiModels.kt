@@ -17,12 +17,10 @@ data class RegisterRequest(
 )
 
 data class AuthResponse(
-    val token: String,
-    val type: String,
     val id: String,
     val email: String,
     val name: String,
-    val role: String // Ej: paciente, especialista, admin
+
 )
 
 // ============ PATIENT MODELS ============

@@ -23,7 +23,9 @@ import com.example.cuidaplus.ui.login.LoginScreen
 import com.example.cuidaplus.ui.register.RegisterScreen
 import com.example.cuidaplus.ui.home.HomeScreen
 import com.example.cuidaplus.ui.services.ServiceListScreen
-
+import com.example.cuidaplus.data.dao.AppointmentDao
+import com.example.cuidaplus.data.remote.AuthApiService
+import com.example.cuidaplus.data.remote.RetrofitClient
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -39,21 +41,30 @@ fun NavGraph(
     startDestination: String
 ) {
     val context = LocalContext.current
-    val sessionManager = SessionManager(context)
-    val authRepository = AuthRepository(sessionManager)
 
-    // Inicializar base de datos y repositorios
-    val database = remember { AppDatabase.getDatabase(context) }
+    // Seguro, no crashea
+    val sessionManager = remember { SessionManager(context) }
+
+    // Inicializar la base de datos correctamente
+    val database = remember { AppDatabase.getDatabase(context.applicationContext) }
+
+    // Repositorios
+    val authRepository = remember { AuthRepository(sessionManager, RetrofitClient.api) }
+    val patientRepository = remember { PatientRepository(database.patientDao()) }
+
 
     NavHost(navController = navController, startDestination = startDestination) {
 
-        // Pantalla Login
+        // LOGIN
         composable(Screen.Login.route) {
-            val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(authRepository))
+            val viewModel: LoginViewModel = viewModel(
+                factory = LoginViewModelFactory(authRepository)
+            )
+
             LoginScreen(
                 viewModel = viewModel,
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
-                onNavigateToForgotPassword = { /* TODO: Implementar */ },
+                onNavigateToForgotPassword = {},
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
@@ -62,9 +73,12 @@ fun NavGraph(
             )
         }
 
-        // Pantalla Registro
+        // REGISTER
         composable(Screen.Register.route) {
-            val viewModel: RegisterViewModel = viewModel(factory = RegisterViewModelFactory(authRepository))
+            val viewModel: RegisterViewModel = viewModel(
+                factory = RegisterViewModelFactory(authRepository)
+            )
+
             RegisterScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.navigateUp() },
@@ -76,8 +90,7 @@ fun NavGraph(
             )
         }
 
-
-// Pantalla Home
+        // HOME
         composable(Screen.Home.route) {
             HomeScreen(
                 onServiciosClick = {
@@ -90,7 +103,5 @@ fun NavGraph(
                 }
             )
         }
-
     }
-    }
-
+}

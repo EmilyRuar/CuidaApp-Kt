@@ -1,6 +1,7 @@
 
 package com.example.cuidaplus.data.database
-
+import com.example.cuidaplus.data.dao.UserDao
+import com.example.cuidaplus.data.model.UserEntity
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -13,8 +14,8 @@ import com.example.cuidaplus.data.model.Patient
 import com.example.cuidaplus.data.model.MedicalService
 
 @Database(
-    entities = [Patient::class, MedicalService::class, Appointment::class],
-    version = 1,
+    entities = [Patient::class, MedicalService::class, Appointment::class , UserEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -22,6 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun patientDao(): PatientDao
     abstract fun medicalServiceDao(): MedicalServiceDao
     abstract fun appointmentDao(): AppointmentDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile

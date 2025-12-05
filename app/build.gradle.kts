@@ -61,7 +61,10 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation(libs.junit.junit)
+    implementation(libs.androidx.foundation)
     ksp("androidx.room:room-compiler:2.6.1")
+
+
 
     // Retrofit (para API)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
